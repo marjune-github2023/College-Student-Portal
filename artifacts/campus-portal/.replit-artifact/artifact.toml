@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Campus Portal"
+description = "A responsive college student and registrar portal for tracking admissions, enrollment, academic progress, grades, graduation readiness, and transcript requests across mobile, tablet, and desktop."
+version = "1.0.0"
+id = "artifacts/campus-portal"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20687
+
+[services.development]
+run = "pnpm --filter @workspace/campus-portal run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/campus-portal", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/campus-portal/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20687"
+BASE_PATH = "/"
