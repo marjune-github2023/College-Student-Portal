@@ -407,6 +407,7 @@ h3 { font:700 14px var(--app-font-serif); color:var(--ink); margin-bottom:4px; }
   .role-work-item { grid-template-columns:78px minmax(0,1fr); }
   .role-work-action,.read-only-action { grid-column:2; justify-self:start; }
 }
+@media(max-width:760px) {
  .sidebar{display:none}
  .topbar{height:57px;padding:0 18px}
  .sample-banner{padding:8px 17px}

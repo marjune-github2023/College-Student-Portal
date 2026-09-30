@@ -1,0 +1,80 @@
+# Base44 development environment for the Campus Portal monorepo.
+# Runs the Vite frontend (port 3000) and the Express API server (port 8000)
+# with a local Postgres instance. Source is bind-mounted for live reload.
+
+x-app-base: &app-base
+  build:
+    context: .
+    dockerfile: Dockerfile.base44
+  working_dir: /app
+  volumes:
+    - .:/app
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: campus
+      POSTGRES_PASSWORD: campus_dev
+      POSTGRES_DB: campus
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campus -d campus"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: on-failure
+
+  # One-shot: installs all workspace dependencies from the lockfile into the
+  # bind-mounted source. App services wait for this to complete so we never
+  # run concurrent installers against the shared node_modules.
+  install-deps:
+    <<: *app-base
+    command: ["sh", "-ec", "pnpm install --frozen-lockfile"]
+    restart: "no"
+
+  api-server:
+    <<: *app-base
+    environment:
+      - PORT=5000
+      - DATABASE_URL=postgresql://campus:campus_dev@postgres:5432/campus
+      - NODE_ENV=development
+    depends_on:
+      install-deps:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "pnpm --filter @workspace/api-server run dev"]
+    ports:
+      - "8000:5000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5000/api/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 120s
+    restart: on-failure
+
+  web:
+    <<: *app-base
+    environment:
+      - PORT=5173
+      - BASE_PATH=/
+      - NODE_ENV=development
+    depends_on:
+      install-deps:
+        condition: service_completed_successfully
+    command: ["sh", "-c", "pnpm --filter @workspace/campus-portal run dev"]
+    ports:
+      - "3000:5173"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5173/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 120s
+    restart: on-failure
+
+volumes:
+  pgdata:
