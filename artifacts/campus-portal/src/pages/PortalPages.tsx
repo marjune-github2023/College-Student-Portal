@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Landmark, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../components/PortalUI';
-import { courses, courseOptions, demoRoles, documents, grades, initialRequests, requirements, student, type Request, type WorkspaceItem, workspacePreviews } from '../data';
+import { courses, courseOptions, demoRoles, documents, grades, initialRequests, requirements, student, type Request } from '../data';
 
 function toneFor(status: string) {
   if (/official|satisfied|complete|approved|enrolled/i.test(status)) return 'green' as const;
@@ -280,62 +280,4 @@ export function RegistrarDashboard() {
   </main>;
 }
 
-export function RoleWorkspacePage() {
-  const [location, setLocation] = useLocation();
-  const slug = location.split('/').filter(Boolean).pop() ?? '';
-  const workspace = workspacePreviews.find((preview) => preview.slug === slug);
-  const role = demoRoles.find((item) => item.slug === slug);
-  const [items, setItems] = useState<WorkspaceItem[]>(workspace?.items ?? []);
-  const [activeItem, setActiveItem] = useState<WorkspaceItem | null>(null);
-  const [actionConfirmed, setActionConfirmed] = useState(false);
-  const { announce, toast } = useNotice();
-  const readOnly = slug === 'auditor-compliance';
-
-  useEffect(() => {
-    setItems(workspace?.items ?? []);
-    setActiveItem(null);
-  }, [slug]);
-
-  function confirmPreviewAction() {
-    if (!activeItem) return;
-    setItems((current) => current.map((item) => item.reference === activeItem.reference ? { ...item, status: 'Previewed locally' } : item));
-    setActiveItem(null);
-    setActionConfirmed(false);
-    announce('Sample action previewed. No live system was changed.');
-  }
-
-  if (!workspace || !role) {
-    return <main className="main-content"><PageHeading eyebrow="Role preview" title="Workspace not found" subtitle="Choose one of the defined demo roles to continue." action={<Link className="btn btn-primary" href="/login">Choose a demo role <ArrowRight /></Link>} /></main>;
-  }
-
-  return <main className="main-content">
-    <PageHeading eyebrow={`${workspace.unit} · DEMO PREVIEW`} title={workspace.heading} subtitle={workspace.intro} action={<Link className="btn btn-outline btn-small" href="/login" data-testid="button-return-role-selector">Switch demo role <ArrowRight /></Link>} />
-    <section className="role-preview-banner">
-      <div><span className="role-preview-overline">{role.name} workspace · fictional sample data</span><h2>{workspace.queueTitle}</h2><p>{workspace.queueNote}</p></div>
-      <div className="role-preview-seal" aria-hidden="true"><span>N</span><small>DEMO<br />VIEW</small></div>
-    </section>
-    <section className="role-metric-strip" aria-label={`${role.name} sample metrics`}>
-      {workspace.metrics.map((metric, index) => <div className="role-metric" key={metric.label}><span className="role-metric-label">{metric.label}</span><strong>{metric.value}</strong><small>{metric.note}</small>{index < workspace.metrics.length - 1 && <i aria-hidden="true" />}</div>)}
-    </section>
-    <div className="grid role-work-layout">
-      <section className="panel panel-pad">
-        <div className="panel-header"><div><div className="panel-kicker">{readOnly ? 'Read-only evidence sample' : `${role.name} · sample work items`}</div><h2>{workspace.queueTitle}</h2><p className="subtitle">{workspace.queueNote}</p></div><Badge tone={readOnly ? 'gray' : 'amber'}>{readOnly ? 'Read only' : `${items.length} sample items`}</Badge></div>
-        <div className="role-work-list">{items.map((item) => <article className="role-work-item" key={item.reference}>
-          <div className="role-work-ref">{item.reference}</div>
-          <div className="role-work-copy"><div className="role-work-title-row"><h3>{item.title}</h3><Badge tone={toneFor(item.priority)}>{item.priority}</Badge></div><p>{item.detail}</p><div className="role-work-meta"><Badge tone={toneFor(item.status)}>{item.status}</Badge>{readOnly && <span className="read-only-caption">View only · no record actions</span>}</div></div>
-          {readOnly ? <span className="read-only-action"><ShieldCheck size={15} /> Read only</span> : <button className="btn btn-outline btn-small role-work-action" onClick={() => { setActiveItem(item); setActionConfirmed(false); }} data-testid={`button-preview-${item.reference.toLowerCase().replaceAll(/[^a-z0-9]+/g,'-')}`}>{item.action}<ArrowRight /></button>}
-        </article>)}</div>
-      </section>
-      <aside className="grid role-side-stack">
-        <section className="panel panel-pad role-widget"><div className="panel-kicker">{workspace.unit}</div><h2>{workspace.widgetTitle}</h2><p className="subtitle">{workspace.widgetNote}</p><div className="role-widget-rows">{workspace.widgetRows.map((row) => <div className="detail-row" key={row.label}><span>{row.label}</span><strong>{row.value}</strong></div>)}</div></section>
-        <section className="notice role-boundary"><CircleHelp /><div><strong>Preview boundary</strong>{workspace.boundary}</div></section>
-        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
-      </aside>
-    </div>
-    {activeItem && <Modal title={activeItem.action} subtitle={`${activeItem.reference} · ${activeItem.title}`} onClose={() => setActiveItem(null)} footer={actionConfirmed ? <><button className="btn btn-outline" onClick={() => setActionConfirmed(false)}>Go back</button><button className="btn btn-primary" onClick={confirmPreviewAction}>Confirm demo action</button></> : <><button className="btn btn-outline" onClick={() => setActiveItem(null)}>Close preview</button><button className="btn btn-primary" onClick={() => setActionConfirmed(true)} data-testid="button-confirm-role-preview">Preview action</button></>}>
-      <div className="detail-row"><span>Current sample status</span><Badge tone={toneFor(activeItem.status)}>{activeItem.status}</Badge></div><div className="detail-row"><span>Role</span><strong>{role.name}</strong></div><div className="notice section-space"><CircleHelp /><div><strong>Local interface preview only</strong>This action will only update the status shown in this sample workspace. It will not contact a campus office or change an official record.</div></div>
-      {actionConfirmed && <div className="modal-confirm-line" role="status">Confirm this sample-only action? The record will be labeled “Previewed locally”.</div>}
-    </Modal>}
-    {toast}
-  </main>;
-}
+export { EnhancedWorkspace as RoleWorkspacePage } from '../components/EnhancedWorkspace';
