@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Landmark, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../components/PortalUI';
-import { courses, courseOptions, documents, grades, initialRequests, requirements, student, type Request } from '../data';
+import { courses, courseOptions, demoRoles, documents, grades, initialRequests, requirements, student, type Request, type WorkspaceItem, workspacePreviews } from '../data';
 
 function toneFor(status: string) {
   if (/official|satisfied|complete|approved|enrolled/i.test(status)) return 'green' as const;
@@ -12,6 +12,11 @@ function toneFor(status: string) {
 }
 
 export function LoginPage() {
+  const [, setLocation] = useLocation();
+  const [roleQuery, setRoleQuery] = useState('');
+  const groups = Array.from(new Set(demoRoles.map((role) => role.group)));
+  const normalizedQuery = roleQuery.trim().toLowerCase();
+  const matchingRoles = demoRoles.filter((role) => `${role.name} ${role.group} ${role.summary}`.toLowerCase().includes(normalizedQuery));
   return <main className="login-page">
     <section className="login-story" aria-label="Northfield College introduction">
       <Link className="login-brand" href="/" aria-label="Northfield College Campus Portal"><span className="brand-mark">N</span><span><span className="brand-name">Northfield College</span><span className="brand-sub" style={{ display:'block' }}>Campus portal</span></span></Link>
@@ -21,13 +26,26 @@ export function LoginPage() {
     </section>
     <section className="login-main" aria-labelledby="login-heading">
       <div className="login-card">
-        <div className="eyebrow">Campus portal · sample access</div>
-        <h2 id="login-heading">Welcome to the preview.</h2>
-        <p className="subtitle">Explore a fictional student workspace and a staff review queue. No account setup is needed for this demo.</p>
-        <div className="login-access-card"><div className="login-access-icon"><GraduationCap /></div><div className="login-access-copy"><strong>Student demo workspace</strong><span>Mara Villanueva · B.S. Environmental Planning</span></div><Badge tone="green">Sample profile</Badge></div>
-        <div className="login-alert" role="note"><ShieldCheck /><div><strong style={{ display:'block', marginBottom:2 }}>Demo-only access — accounts are not authenticated.</strong>This is a UI sample. No username or password is requested or processed, and continuing does not sign into a real account.</div></div>
+        <div className="eyebrow">Campus portal · role preview</div>
+        <h2 id="login-heading">Choose a demo workspace.</h2>
+        <p className="subtitle">Explore role-specific screens built from fictional examples in the College Admission-to-TOR guide.</p>
+        <div className="login-alert" role="note"><ShieldCheck /><div><strong style={{ display:'block', marginBottom:2 }}>Demo preview · sample data · not live.</strong>No account is authenticated. Choosing a role only opens its fictional workspace; it does not sign in or grant access to a real system.</div></div>
         <Link className="btn btn-primary login-continue" href="/" data-testid="button-continue-demo">Continue to demo workspace <ArrowRight /></Link>
-        <p className="login-footnote">Continue opens the student dashboard at <span style={{ fontFamily:'var(--app-font-mono)' }}>/</span>. All names and records are fictional sample data.</p>
+        <p className="login-footnote" style={{ marginTop:8, marginBottom:18 }}>Opens the Student dashboard. Or choose any role preview below.</p>
+        <label className="role-search-label" htmlFor="role-search">Find a role</label>
+        <div className="role-search-wrap"><Search aria-hidden="true" /><input id="role-search" className="field" type="search" placeholder="Search roles or responsibilities…" value={roleQuery} onChange={(event) => setRoleQuery(event.target.value)} autoComplete="off" data-testid="input-role-search" /></div>
+        <div className="role-groups">
+          {groups.map((group) => {
+            const roles = matchingRoles.filter((role) => role.group === group);
+            if (!roles.length) return null;
+            return <section className="role-group" key={group} aria-label={group}>
+              <div className="role-group-heading">{group}<span>{roles.length.toString().padStart(2,'0')}</span></div>
+              <div className="role-grid">{roles.map((role) => <button key={role.slug} type="button" className="role-option" onClick={() => setLocation(role.route)} aria-label={`Open ${role.name} demo preview`} data-testid={`button-role-${role.slug}`}><span className="role-option-copy"><strong>{role.name}</strong><small>{role.summary}</small></span><ArrowRight aria-hidden="true" /></button>)}</div>
+            </section>;
+          })}
+          {matchingRoles.length === 0 && <div className="role-empty" role="status"><Search /><strong>No matching roles</strong><span>Try a role title or responsibility keyword.</span></div>}
+        </div>
+        <p className="login-footnote">All role previews are local interface samples using fictional data. Applicant, Student, Registrar, and staff views are distinct demo workspaces.</p>
       </div>
     </section>
   </main>;
@@ -258,6 +276,66 @@ export function RegistrarDashboard() {
       <div className="modal-actions" style={{ justifyContent:'space-between' }}><button className="btn btn-outline" onClick={() => setSelected(null)}>Close</button><div style={{ display:'flex',gap:8 }}><button className="btn btn-secondary" onClick={() => setConfirmStatus('Returned')}>Return</button><button className="btn btn-primary" onClick={() => setConfirmStatus(selected.type.startsWith('Transcript') || selected.type.startsWith('Graduation') ? 'Completed' : 'Approved')}>Mark reviewed</button></div></div>
     </Modal>}
     {confirmStatus && selected && <Modal title={`${confirmStatus} this sample item?`} subtitle="This is a consequential staff action in the demo queue and only changes local sample data." onClose={() => setConfirmStatus('')} footer={<><button className="btn btn-outline" onClick={() => setConfirmStatus('')}>Cancel</button><button className="btn btn-primary" onClick={applyStatus}>Confirm {confirmStatus.toLowerCase()}</button></>}><div className="notice"><TriangleAlert /><div><strong>{selected.reference} · {selected.studentName}</strong>The displayed status will be updated in this browser session only.</div></div></Modal>}
+    {toast}
+  </main>;
+}
+
+export function RoleWorkspacePage() {
+  const [location, setLocation] = useLocation();
+  const slug = location.split('/').filter(Boolean).pop() ?? '';
+  const workspace = workspacePreviews.find((preview) => preview.slug === slug);
+  const role = demoRoles.find((item) => item.slug === slug);
+  const [items, setItems] = useState<WorkspaceItem[]>(workspace?.items ?? []);
+  const [activeItem, setActiveItem] = useState<WorkspaceItem | null>(null);
+  const [actionConfirmed, setActionConfirmed] = useState(false);
+  const { announce, toast } = useNotice();
+  const readOnly = slug === 'auditor-compliance';
+
+  useEffect(() => {
+    setItems(workspace?.items ?? []);
+    setActiveItem(null);
+  }, [slug]);
+
+  function confirmPreviewAction() {
+    if (!activeItem) return;
+    setItems((current) => current.map((item) => item.reference === activeItem.reference ? { ...item, status: 'Previewed locally' } : item));
+    setActiveItem(null);
+    setActionConfirmed(false);
+    announce('Sample action previewed. No live system was changed.');
+  }
+
+  if (!workspace || !role) {
+    return <main className="main-content"><PageHeading eyebrow="Role preview" title="Workspace not found" subtitle="Choose one of the defined demo roles to continue." action={<Link className="btn btn-primary" href="/login">Choose a demo role <ArrowRight /></Link>} /></main>;
+  }
+
+  return <main className="main-content">
+    <PageHeading eyebrow={`${workspace.unit} · DEMO PREVIEW`} title={workspace.heading} subtitle={workspace.intro} action={<Link className="btn btn-outline btn-small" href="/login" data-testid="button-return-role-selector">Switch demo role <ArrowRight /></Link>} />
+    <section className="role-preview-banner">
+      <div><span className="role-preview-overline">{role.name} workspace · fictional sample data</span><h2>{workspace.queueTitle}</h2><p>{workspace.queueNote}</p></div>
+      <div className="role-preview-seal" aria-hidden="true"><span>N</span><small>DEMO<br />VIEW</small></div>
+    </section>
+    <section className="role-metric-strip" aria-label={`${role.name} sample metrics`}>
+      {workspace.metrics.map((metric, index) => <div className="role-metric" key={metric.label}><span className="role-metric-label">{metric.label}</span><strong>{metric.value}</strong><small>{metric.note}</small>{index < workspace.metrics.length - 1 && <i aria-hidden="true" />}</div>)}
+    </section>
+    <div className="grid role-work-layout">
+      <section className="panel panel-pad">
+        <div className="panel-header"><div><div className="panel-kicker">{readOnly ? 'Read-only evidence sample' : `${role.name} · sample work items`}</div><h2>{workspace.queueTitle}</h2><p className="subtitle">{workspace.queueNote}</p></div><Badge tone={readOnly ? 'gray' : 'amber'}>{readOnly ? 'Read only' : `${items.length} sample items`}</Badge></div>
+        <div className="role-work-list">{items.map((item) => <article className="role-work-item" key={item.reference}>
+          <div className="role-work-ref">{item.reference}</div>
+          <div className="role-work-copy"><div className="role-work-title-row"><h3>{item.title}</h3><Badge tone={toneFor(item.priority)}>{item.priority}</Badge></div><p>{item.detail}</p><div className="role-work-meta"><Badge tone={toneFor(item.status)}>{item.status}</Badge>{readOnly && <span className="read-only-caption">View only · no record actions</span>}</div></div>
+          {readOnly ? <span className="read-only-action"><ShieldCheck size={15} /> Read only</span> : <button className="btn btn-outline btn-small role-work-action" onClick={() => { setActiveItem(item); setActionConfirmed(false); }} data-testid={`button-preview-${item.reference.toLowerCase().replaceAll(/[^a-z0-9]+/g,'-')}`}>{item.action}<ArrowRight /></button>}
+        </article>)}</div>
+      </section>
+      <aside className="grid role-side-stack">
+        <section className="panel panel-pad role-widget"><div className="panel-kicker">{workspace.unit}</div><h2>{workspace.widgetTitle}</h2><p className="subtitle">{workspace.widgetNote}</p><div className="role-widget-rows">{workspace.widgetRows.map((row) => <div className="detail-row" key={row.label}><span>{row.label}</span><strong>{row.value}</strong></div>)}</div></section>
+        <section className="notice role-boundary"><CircleHelp /><div><strong>Preview boundary</strong>{workspace.boundary}</div></section>
+        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+      </aside>
+    </div>
+    {activeItem && <Modal title={activeItem.action} subtitle={`${activeItem.reference} · ${activeItem.title}`} onClose={() => setActiveItem(null)} footer={actionConfirmed ? <><button className="btn btn-outline" onClick={() => setActionConfirmed(false)}>Go back</button><button className="btn btn-primary" onClick={confirmPreviewAction}>Confirm demo action</button></> : <><button className="btn btn-outline" onClick={() => setActiveItem(null)}>Close preview</button><button className="btn btn-primary" onClick={() => setActionConfirmed(true)} data-testid="button-confirm-role-preview">Preview action</button></>}>
+      <div className="detail-row"><span>Current sample status</span><Badge tone={toneFor(activeItem.status)}>{activeItem.status}</Badge></div><div className="detail-row"><span>Role</span><strong>{role.name}</strong></div><div className="notice section-space"><CircleHelp /><div><strong>Local interface preview only</strong>This action will only update the status shown in this sample workspace. It will not contact a campus office or change an official record.</div></div>
+      {actionConfirmed && <div className="modal-confirm-line" role="status">Confirm this sample-only action? The record will be labeled “Previewed locally”.</div>}
+    </Modal>}
     {toast}
   </main>;
 }

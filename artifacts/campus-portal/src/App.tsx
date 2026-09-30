@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { PortalShell } from '@/components/PortalUI';
-import { LoginPage, StudentDashboard, EnrollmentPage, GradesPage, ProgressPage, DocumentsPage, RegistrarDashboard } from '@/pages/PortalPages';
+import { LoginPage, StudentDashboard, EnrollmentPage, GradesPage, ProgressPage, DocumentsPage, RegistrarDashboard, RoleWorkspacePage } from '@/pages/PortalPages';
 import { Link, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
@@ -21,6 +21,7 @@ function Router() {
         <Route path="/student/progress" component={ProgressPage} />
         <Route path="/student/documents" component={DocumentsPage} />
         <Route path="/registrar/dashboard" component={RegistrarDashboard} />
+        <Route path="/workspace/:slug" component={RoleWorkspacePage} />
         <Route>
           <main className="main-content"><div className="eyebrow">Northfield College · Campus Portal</div><h1>Page not found</h1><p className="subtitle">That address is not part of this portal preview.</p><Link className="btn btn-primary" href="/student/dashboard" style={{ marginTop: 18 }}>Return to student dashboard</Link></main>
         </Route>

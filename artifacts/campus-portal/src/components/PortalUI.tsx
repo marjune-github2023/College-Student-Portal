@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Bell, BookOpen, CalendarDays, Check, ChevronDown, ChevronRight, ClipboardList, FileText, GraduationCap, LayoutDashboard, LogOut, X } from 'lucide-react';
-import { student } from '../data';
+import { Bell, BookOpen, CalendarDays, Check, ChevronDown, ChevronRight, ClipboardList, FileText, GraduationCap, LayoutDashboard, LogOut, UsersRound, X } from 'lucide-react';
+import { demoRoles } from '../data';
 
 export function Badge({ children, tone }: { children: ReactNode; tone?: 'green' | 'amber' | 'red' | 'gray' }) {
   return <span className={`chip chip-${tone ?? 'gray'}`}>{children}</span>;
@@ -11,7 +11,7 @@ export function PageHeading({ eyebrow, title, subtitle, action }: { eyebrow: str
   return <div className="page-heading"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p className="subtitle">{subtitle}</p></div>{action}</div>;
 }
 
-export function Modal({ title, subtitle, onClose, children, footer }: { title: string; subtitle?: string; onClose: () => void; children?: React.ReactNode; footer?: React.ReactNode }) {
+export function Modal({ title, subtitle, onClose, children, footer }: { title: string; subtitle?: string; onClose: () => void; children?: ReactNode; footer?: ReactNode }) {
   return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <section className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div className="modal-head"><div><h2 id="modal-title">{title}</h2>{subtitle && <p className="subtitle">{subtitle}</p>}</div><button className="modal-close" onClick={onClose} aria-label="Close dialog" data-testid="button-close-dialog"><X /></button></div>
@@ -45,6 +45,9 @@ export function PortalShell({ children }: { children: ReactNode }) {
   const [sampleNotice, setSampleNotice] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const staff = location.startsWith('/registrar');
+  const workspaceSlug = location.startsWith('/workspace/') ? location.split('/').pop() : '';
+  const activeRole = workspaceSlug ? demoRoles.find((role) => role.slug === workspaceSlug)?.name ?? 'Demo workspace' : staff ? 'Registrar' : 'Student';
+  const roleInitials = activeRole.split(/[\s/]+/).filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
   if (location === '/login') return <>{children}</>;
   function signOut() {
     setAccountOpen(false);
@@ -59,10 +62,13 @@ export function PortalShell({ children }: { children: ReactNode }) {
       {studentLinks.map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-link ${location === href || (location === '/' && href === '/student/dashboard') ? 'active' : ''}`} aria-current={location === href ? 'page' : undefined} data-testid={`link-${label.toLowerCase().replaceAll(' ', '-')}`}><Icon />{label}</Link>)}
       <div className="nav-caption">Registrar office</div>
       {staffLinks.map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-link ${location === href ? 'active' : ''}`} aria-current={location === href ? 'page' : undefined} data-testid="link-registrar-dashboard"><Icon />{label}</Link>)}
-      <div className="sidebar-bottom"><div className="profile"><div className="avatar">MV</div><div><strong>{staff ? 'Registrar desk' : student.name}</strong><small>{staff ? 'Staff sample view' : student.studentId}</small></div></div></div>
+      <div className="nav-caption">Role preview</div>
+      <Link href="/login" className="nav-link" data-testid="link-change-demo-role"><UsersRound />Choose another role</Link>
+      <div className="sidebar-bottom"><div className="profile"><div className="avatar">{roleInitials}</div><div><strong>{activeRole}</strong><small>Demo preview · sample data</small></div></div></div>
     </aside>
     <div className="shell-main">
-      <header className="topbar"><div className="crumb"><BookOpen size={15} />{staff ? 'Registrar workspace' : 'Student workspace'}<ChevronRight size={13} /><span>{staff ? 'Review queue' : 'Academic year 2025–26'}</span></div><div className="top-actions"><span className="demo-tag"><span className="demo-dot" />DEMO DATA</span><button className="icon-button" aria-label="Sample portal notice" title="Sample portal notice" onClick={() => setSampleNotice((value) => !value)}><Bell size={17} /></button><div className="account-wrap"><button className="account-trigger" type="button" aria-haspopup="menu" aria-expanded={accountOpen} aria-controls="account-menu" onClick={() => setAccountOpen((value) => !value)} onKeyDown={(event) => { if (event.key === 'Escape') setAccountOpen(false); }} data-testid="button-account-menu"><span className="account-avatar">{staff ? 'RO' : 'MV'}</span><span className="account-label">{staff ? 'Registrar desk' : 'Mara V.'}<small>Demo account</small></span><ChevronDown size={14} /></button>{accountOpen && <div className="account-menu" id="account-menu" role="menu" aria-label="Demo account actions"><div className="account-menu-intro"><strong>{staff ? 'Registrar sample view' : student.name}</strong><span>{staff ? 'Staff demo workspace' : student.studentId}</span></div><div className="account-menu-note">This is a demo-only workspace. No account is authenticated.</div><button className="account-menu-action" role="menuitem" onClick={signOut} data-testid="button-sign-out"><LogOut size={15} />Sign out to demo welcome</button></div>}</div></div></header>
+      <header className="topbar"><div className="crumb"><BookOpen size={15} /><strong>{activeRole} preview</strong><ChevronRight size={13} /><span>{staff ? 'Review queue' : workspaceSlug ? 'Role workspace' : 'Academic year 2025–26'}</span></div><div className="top-actions"><span className="demo-tag"><span className="demo-dot" />DEMO PREVIEW</span><button className="icon-button" aria-label="Sample portal notice" title="Sample portal notice" onClick={() => setSampleNotice((value) => !value)}><Bell size={17} /></button><div className="account-wrap"><button className="account-trigger" type="button" aria-haspopup="menu" aria-expanded={accountOpen} aria-controls="account-menu" onClick={() => setAccountOpen((value) => !value)} onKeyDown={(event) => { if (event.key === 'Escape') setAccountOpen(false); }} data-testid="button-account-menu"><span className="account-avatar">{roleInitials}</span><span className="account-label">{activeRole}<small>Preview role</small></span><ChevronDown size={14} /></button>{accountOpen && <div className="account-menu" id="account-menu" role="menu" aria-label="Demo account actions"><div className="account-menu-intro"><strong>{activeRole} demo workspace</strong><span>Sample data · not live</span></div><div className="account-menu-note">No account authenticated. This role selection is a visual preview only.</div><button className="account-menu-action" role="menuitem" onClick={() => { setAccountOpen(false); setLocation('/login'); }} data-testid="button-switch-role"><UsersRound size={15} />Choose another demo role</button><button className="account-menu-action" role="menuitem" onClick={signOut} data-testid="button-sign-out"><LogOut size={15} />Sign out to role selector</button></div>}</div></div></header>
+      <div className="demo-status-line" role="note"><span><strong>Demo preview</strong> · sample data · not live · no account authenticated</span><Link href="/login" data-testid="link-role-selector">Switch role</Link></div>
       {sampleNotice && <div className="sample-banner" role="status"><span>This portal is showing fictional local sample information.</span><button onClick={() => setSampleNotice(false)} aria-label="Dismiss notice"><X size={14} /></button></div>}
       {children}
     </div>
