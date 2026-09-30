@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { PortalShell } from '@/components/PortalUI';
-import { StudentDashboard, EnrollmentPage, GradesPage, ProgressPage, DocumentsPage, RegistrarDashboard } from '@/pages/PortalPages';
+import { LoginPage, StudentDashboard, EnrollmentPage, GradesPage, ProgressPage, DocumentsPage, RegistrarDashboard } from '@/pages/PortalPages';
 import { Link, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
@@ -13,6 +13,7 @@ function Router() {
   return <PortalShell>
     <RoutedErrorBoundary>
       <Switch>
+        <Route path="/login" component={LoginPage} />
         <Route path="/" component={StudentDashboard} />
         <Route path="/student/dashboard" component={StudentDashboard} />
         <Route path="/student/enrollment" component={EnrollmentPage} />

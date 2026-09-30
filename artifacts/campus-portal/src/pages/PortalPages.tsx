@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
+import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Landmark, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
 import { Link } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../components/PortalUI';
 import { courses, courseOptions, documents, grades, initialRequests, requirements, student, type Request } from '../data';
@@ -9,6 +9,28 @@ function toneFor(status: string) {
   if (/provisional|progress|queue|awaiting|open/i.test(status)) return 'amber' as const;
   if (/needed|review|remaining|waitlist|high/i.test(status)) return 'red' as const;
   return 'gray' as const;
+}
+
+export function LoginPage() {
+  return <main className="login-page">
+    <section className="login-story" aria-label="Northfield College introduction">
+      <Link className="login-brand" href="/" aria-label="Northfield College Campus Portal"><span className="brand-mark">N</span><span><span className="brand-name">Northfield College</span><span className="brand-sub" style={{ display:'block' }}>Campus portal</span></span></Link>
+      <div className="login-quote"><div className="login-overline">A clearer way through college</div><h1>Know where you are. <span>See what comes next.</span></h1><p>One welcoming place to understand academic plans, official records, and the steps between them.</p></div>
+      <div className="login-orbit" aria-hidden="true"><Landmark /></div>
+      <div className="login-story-foot">NORTHFIELD COLLEGE · STUDENT & REGISTRAR PORTAL</div>
+    </section>
+    <section className="login-main" aria-labelledby="login-heading">
+      <div className="login-card">
+        <div className="eyebrow">Campus portal · sample access</div>
+        <h2 id="login-heading">Welcome to the preview.</h2>
+        <p className="subtitle">Explore a fictional student workspace and a staff review queue. No account setup is needed for this demo.</p>
+        <div className="login-access-card"><div className="login-access-icon"><GraduationCap /></div><div className="login-access-copy"><strong>Student demo workspace</strong><span>Mara Villanueva · B.S. Environmental Planning</span></div><Badge tone="green">Sample profile</Badge></div>
+        <div className="login-alert" role="note"><ShieldCheck /><div><strong style={{ display:'block', marginBottom:2 }}>Demo-only access — accounts are not authenticated.</strong>This is a UI sample. No username or password is requested or processed, and continuing does not sign into a real account.</div></div>
+        <Link className="btn btn-primary login-continue" href="/" data-testid="button-continue-demo">Continue to demo workspace <ArrowRight /></Link>
+        <p className="login-footnote">Continue opens the student dashboard at <span style={{ fontFamily:'var(--app-font-mono)' }}>/</span>. All names and records are fictional sample data.</p>
+      </div>
+    </section>
+  </main>;
 }
 
 function CurrentTerm() {
