@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Landmark, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../components/PortalUI';
-import { courses, courseOptions, demoRoles, documents, grades, initialRequests, requirements, student, type Request, type WorkspaceItem, workspacePreviews } from '../data';
+import { courses, courseOptions, demoRoles, documents, grades, initialRequests, requirements, student, type DemoRole, type Request, type WorkspaceItem, workspacePreviews } from '../data';
 
 function toneFor(status: string) {
   if (/official|satisfied|complete|approved|enrolled/i.test(status)) return 'green' as const;
@@ -16,7 +16,7 @@ export function LoginPage() {
   const [roleQuery, setRoleQuery] = useState('');
   const groups = Array.from(new Set(demoRoles.map((role) => role.group)));
   const normalizedQuery = roleQuery.trim().toLowerCase();
-  const matchingRoles = demoRoles.filter((role) => `${role.name} ${role.group} ${role.summary}`.toLowerCase().includes(normalizedQuery));
+  const matchingRoles = demoRoles.filter((role) => `${role.name} ${role.group} ${role.summary} ${role.contents.map((item) => `${item.title} ${item.detail}`).join(' ')}`.toLowerCase().includes(normalizedQuery));
   return <main className="login-page">
     <section className="login-story" aria-label="Northfield College introduction">
       <Link className="login-brand" href="/" aria-label="Northfield College Campus Portal"><span className="brand-mark">N</span><span><span className="brand-name">Northfield College</span><span className="brand-sub" style={{ display:'block' }}>Campus portal</span></span></Link>
@@ -40,7 +40,7 @@ export function LoginPage() {
             if (!roles.length) return null;
             return <section className="role-group" key={group} aria-label={group}>
               <div className="role-group-heading">{group}<span>{roles.length.toString().padStart(2,'0')}</span></div>
-              <div className="role-grid">{roles.map((role) => <button key={role.slug} type="button" className="role-option" onClick={() => setLocation(role.route)} aria-label={`Open ${role.name} demo preview`} data-testid={`button-role-${role.slug}`}><span className="role-option-copy"><strong>{role.name}</strong><small>{role.summary}</small></span><ArrowRight aria-hidden="true" /></button>)}</div>
+              <div className="role-grid">{roles.map((role) => <button key={role.slug} type="button" className="role-option" onClick={() => setLocation(role.route)} aria-label={`Open ${role.name} demo preview`} data-testid={`button-role-${role.slug}`}><span className="role-option-copy"><strong>{role.name}</strong><small>{role.summary}</small><small className="role-option-includes">Includes: {role.contents.map((item) => item.title).join(' · ')}</small></span><ArrowRight aria-hidden="true" /></button>)}</div>
             </section>;
           })}
           {matchingRoles.length === 0 && <div className="role-empty" role="status"><Search /><strong>No matching roles</strong><span>Try a role title or responsibility keyword.</span></div>}
@@ -51,14 +51,31 @@ export function LoginPage() {
   </main>;
 }
 
+function RoleContentsGuide({ role, heading = 'What belongs in this workspace' }: { role: DemoRole; heading?: string }) {
+  return <section className="panel panel-pad role-contents-panel" aria-label={`${role.name} workspace contents`} data-testid={`role-contents-${role.slug}`}>
+    <div className="panel-header"><div><div className="panel-kicker">{role.name} · role guide</div><h2>{heading}</h2></div></div>
+    <div className="role-contents-grid">
+      {role.contents.map((item) => {
+        const content = <><strong>{item.title}</strong><span>{item.detail}</span>{item.href && <ArrowRight aria-hidden="true" />}</>;
+        const className = `role-content-card${item.href ? ' is-link' : ''}`;
+        return item.href
+          ? <Link key={item.title} href={item.href} className={className} data-testid={`role-content-${role.slug}-${item.title.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-')}`}>{content}</Link>
+          : <article key={item.title} className={className} data-testid={`role-content-${role.slug}-${item.title.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-')}`}>{content}</article>;
+      })}
+    </div>
+  </section>;
+}
+
 function CurrentTerm() {
   return <div className="panel panel-pad"><div className="panel-kicker">Current term</div><div style={{ fontSize: 13, fontWeight: 700, color: '#304149' }}>Second Semester</div><div className="stat-foot">Academic year 2025–26 <span aria-hidden="true">·</span> Week 8 of 16</div></div>;
 }
 
 export function StudentDashboard() {
   const { announce, toast } = useNotice();
+  const studentRole = demoRoles.find((role) => role.slug === 'student')!;
   return <main className="main-content">
     <PageHeading eyebrow="Tuesday, March 24, 2026 · Student home" title={<>Good morning, <span style={{ color: '#427260' }}>Mara.</span></>} subtitle="A clear view of what’s next in your semester." />
+    <RoleContentsGuide role={studentRole} heading="Your student workspace at a glance" />
     <section className="hero-card" aria-label="Student profile summary">
       <div className="hero-top"><span className="hero-tag">Your academic snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
       <div className="hero-name"><h2>{student.program}</h2><p>Keep your semester moving. Your progress and next steps are gathered here, with official records clearly labeled.</p><button className="btn btn-secondary btn-small" onClick={() => announce('Student profile details are shown in this local demo.')}>View student details <ArrowRight /></button></div>
@@ -235,6 +252,7 @@ export function DocumentsPage() {
 }
 
 export function RegistrarDashboard() {
+  const registrarRole = demoRoles.find((role) => role.slug === 'registrar')!;
   const [requests, setRequests] = useState<Request[]>(initialRequests);
   const [filter, setFilter] = useState('All work');
   const [search, setSearch] = useState('');
@@ -260,9 +278,10 @@ export function RegistrarDashboard() {
   }
   return <main className="main-content">
     <PageHeading eyebrow="Registrar office · Staff sample view" title="Review queue" subtitle="Triage academic record work with clear sample statuses. No actions are sent to a live system." action={<span className="demo-tag"><span className="demo-dot" />STAFF DEMO</span>} />
+    <RoleContentsGuide role={registrarRole} heading="Registrar responsibilities" />
     <div className="notice" style={{ marginBottom:18 }}><CircleHelp /><div><strong>Local prototype queue.</strong>Opening, filtering, and reviewing rows works in this browser. Approve or return actions update only the sample list.</div></div>
     <div className="grid queue-stats" style={{ gridTemplateColumns:'repeat(4,1fr)', gap:11, marginBottom:19 }}>{counts.map(({label,count,icon:Icon}) => <div className="queue-stat" key={label}><div style={{ display:'flex',justifyContent:'space-between',alignItems:'center' }}><span>{label}</span><Icon size={16} color="#678b78" /></div><strong>{count}</strong></div>)}</div>
-    <section className="panel panel-pad">
+    <section className="panel panel-pad" id="requests-and-reviews">
       <div className="panel-header"><div><div className="panel-kicker">Incoming work · local sample records</div><h2>Requests and reviews</h2></div><Badge tone="amber">{filtered.length} in view</Badge></div>
       <div className="filter-row"><div style={{ position:'relative', flex:'1 1 230px' }}><Search size={15} style={{ position:'absolute',left:11,top:11,color:'#8a928e' }} /><input className="field" style={{ paddingLeft:34 }} type="search" placeholder="Search name, type, reference…" value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Search queue" data-testid="input-queue-search" /></div><select className="field" value={filter} onChange={(event) => setFilter(event.target.value)} aria-label="Filter work type" data-testid="select-queue-filter">{['All work','Admissions','Grade approvals','Graduation checks','TOR requests'].map((item) => <option key={item}>{item}</option>)}</select><button className="btn btn-outline btn-small" onClick={() => { setSearch(''); setFilter('All work'); }} data-testid="button-clear-filters"><X /> Clear</button></div>
       <div className="table-wrap"><table className="data-table"><thead><tr><th>Reference / Student</th><th>Work type</th><th>Received</th><th>Priority</th><th>Status</th><th>Review</th></tr></thead><tbody>{filtered.map((item) => <tr key={item.reference} className="staff-row" onClick={() => setSelected(item)} tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter') setSelected(item); }} data-testid={`row-request-${item.reference.toLowerCase()}`}><td><strong>{item.reference}</strong><small>{item.studentName}</small></td><td>{item.type}</td><td>{item.submittedAt}</td><td><Badge tone={toneFor(item.priority)}>{item.priority}</Badge></td><td><Badge tone={toneFor(item.status)}>{item.status}</Badge></td><td><button className="btn btn-outline btn-small" onClick={(event) => { event.stopPropagation(); setSelected(item); }} aria-label={`Review ${item.reference}`} data-testid={`button-review-${item.reference.toLowerCase()}`}>Review <ArrowRight /></button></td></tr>)}</tbody></table></div>
@@ -317,6 +336,7 @@ export function RoleWorkspacePage() {
     <section className="role-metric-strip" aria-label={`${role.name} sample metrics`}>
       {workspace.metrics.map((metric, index) => <div className="role-metric" key={metric.label}><span className="role-metric-label">{metric.label}</span><strong>{metric.value}</strong><small>{metric.note}</small>{index < workspace.metrics.length - 1 && <i aria-hidden="true" />}</div>)}
     </section>
+    <RoleContentsGuide role={role} />
     <div className="grid role-work-layout">
       <section className="panel panel-pad">
         <div className="panel-header"><div><div className="panel-kicker">{readOnly ? 'Read-only evidence sample' : `${role.name} · sample work items`}</div><h2>{workspace.queueTitle}</h2><p className="subtitle">{workspace.queueNote}</p></div><Badge tone={readOnly ? 'gray' : 'amber'}>{readOnly ? 'Read only' : `${items.length} sample items`}</Badge></div>

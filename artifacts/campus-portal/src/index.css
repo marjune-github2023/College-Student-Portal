@@ -191,6 +191,7 @@
 .role-option-copy { display:block; min-width:0; }
 .role-option strong { display:block; color:#34464a; font-size:11px; line-height:1.35; }
 .role-option small { display:block; color:#848c87; font-size:9px; line-height:1.4; margin-top:4px; }
+.role-option .role-option-includes { color:#537664; font-size:8px; }
 .role-option > svg { width:14px; height:14px; flex:none; color:#688978; }
 .role-empty { border:1px dashed #d8d2c6; border-radius:11px; padding:23px 14px; text-align:center; color:#77827b; }
 .role-empty svg { width:17px; margin-bottom:6px; }
@@ -211,6 +212,16 @@
 .role-metric-label { color:#868d87; font:500 9px var(--app-font-mono); text-transform:uppercase; letter-spacing:.08em; }
 .role-metric strong { color:#2b3c42; font:700 25px var(--app-font-serif); letter-spacing:-.04em; margin:6px 0 2px; }
 .role-metric small { color:#878e88; font-size:10px; line-height:1.4; }
+.role-contents-panel { margin-bottom:17px; }
+.role-contents-panel .panel-header { margin-bottom:12px; }
+.role-contents-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:9px; }
+.role-content-card { min-height:90px; position:relative; display:flex; flex-direction:column; gap:6px; border:1px solid #eae5da; border-radius:10px; padding:12px 13px; background:#fbfaf6; color:#33464a; text-decoration:none; }
+.role-content-card strong { color:#364c48; font-size:11px; line-height:1.35; }
+.role-content-card span { color:#7c8580; font-size:10px; line-height:1.5; padding-right:12px; }
+.role-content-card > svg { position:absolute; right:11px; top:12px; width:13px; height:13px; color:#668675; }
+.role-content-card.is-link { transition:background .16s,border-color .16s,transform .16s; }
+.role-content-card.is-link:hover { background:#f0f4ec; border-color:#a4bba8; transform:translateY(-1px); }
+.role-content-card:focus-visible { outline:2px solid #5d806c; outline-offset:2px; }
 .role-work-layout { grid-template-columns:minmax(0,1.55fr) minmax(260px,.82fr); align-items:start; }
 .role-side-stack { gap:14px; }
 .role-widget-rows { margin-top:14px; }
@@ -407,6 +418,7 @@ h3 { font:700 14px var(--app-font-serif); color:var(--ink); margin-bottom:4px; }
   .role-work-item { grid-template-columns:78px minmax(0,1fr); }
   .role-work-action,.read-only-action { grid-column:2; justify-self:start; }
 }
+@media(max-width:760px) {
  .sidebar{display:none}
  .topbar{height:57px;padding:0 18px}
  .sample-banner{padding:8px 17px}
