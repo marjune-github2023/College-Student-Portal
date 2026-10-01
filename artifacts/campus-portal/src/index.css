@@ -383,6 +383,166 @@ h3 { font:700 14px var(--app-font-serif); color:var(--ink); margin-bottom:4px; }
 .empty-state svg {color:#789987;margin-bottom:9px}
 .empty-state strong {display:block;color:#40514e;font-size:13px;margin-bottom:5px}
 .empty-state p {font-size:11px;margin:0}
+.admissions-page { animation: rise .24s ease both; }
+.admissions-page .role-contents-panel { margin-bottom:17px; }
+.admissions-boundary { margin:0 0 19px; }
+.admissions-boundary svg { color:#897147; }
+.applicant-profile { position:relative; overflow:hidden; display:flex; justify-content:space-between; align-items:center; padding:25px 28px; margin-bottom:17px; background:#315e54; color:#f6f1e7; }
+.applicant-profile:after { content:""; position:absolute; width:230px; height:230px; border:1px solid #ffffff23; border-radius:50%; right:100px; top:-157px; box-shadow:0 0 0 23px #ffffff0a,0 0 0 49px #ffffff06; pointer-events:none; }
+.applicant-profile-main { position:relative; z-index:1; width:100%; }
+.profile-eyebrow { color:#e6cc91; font:500 9px var(--app-font-mono); letter-spacing:.11em; text-transform:uppercase; margin-bottom:13px; }
+.profile-eyebrow span { margin-left:8px; color:#bdd0c3; }
+.applicant-title-row { display:flex; justify-content:space-between; align-items:flex-start; gap:15px; }
+.applicant-title-row h2,.case-heading h2 { color:#fbf5e8; font-size:23px; margin:0 0 5px; }
+.applicant-title-row p,.case-heading p { color:#d5e0d9; font-size:12px; margin:0; }
+.applicant-title-row .chip { background:#ffffff20; color:#fff6dd; }
+.applicant-facts { display:flex; flex-wrap:wrap; gap:27px; border-top:1px solid #ffffff29; margin-top:22px; padding-top:15px; }
+.applicant-facts span,.applicant-facts strong { display:block; }
+.applicant-facts span { color:#b7c9c0; font:9px var(--app-font-mono); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
+.applicant-facts strong { color:#f5f1e7; font-size:11px; }
+.applicant-seal { width:67px; height:67px; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:none; z-index:1; border:1px solid #d6c48d; border-radius:50%; color:#f0d99d; margin-left:25px; }
+.applicant-seal span { font:700 23px var(--app-font-serif); line-height:1; }
+.applicant-seal small { font:5px var(--app-font-mono); letter-spacing:.09em; text-align:center; margin-top:4px; }
+.journey-panel { margin-bottom:17px; }
+.journey-count { color:#315e54; font:600 15px var(--app-font-mono); }
+.journey-count span { color:#9ba19a; font-size:10px; }
+.journey-list { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); list-style:none; padding:5px 0 0; margin:0; }
+.journey-list li { position:relative; min-width:0; display:flex; flex-direction:column; gap:9px; padding-right:13px; }
+.journey-marker { z-index:1; width:28px; height:28px; border-radius:50%; background:#eeece5; color:#7f8780; display:grid; place-items:center; font:600 9px var(--app-font-mono); }
+.journey-done .journey-marker { background:#315e54; color:#fffefa; }
+.journey-current .journey-marker { background:#f2e4c4; color:#81623a; box-shadow:0 0 0 4px #f9f5ec; }
+.journey-line { position:absolute; left:28px; right:0; top:13px; height:1px; background:#ded9ce; }
+.journey-list li:last-child .journey-line { display:none; }
+.journey-copy strong,.journey-copy span { display:block; }
+.journey-copy strong { color:#35464a; font-size:11px; line-height:1.3; }
+.journey-copy span { color:#838b86; font-size:9px; line-height:1.5; margin-top:4px; }
+.journey-current .journey-copy strong { color:#926a38; }
+.admissions-columns { margin-top:17px; }
+.admissions-side-stack,.officer-main-stack { display:grid; gap:15px; min-width:0; }
+.admissions-doc-list { display:flex; flex-direction:column; }
+.admissions-doc-row { min-width:0; display:flex; align-items:center; gap:11px; padding:13px 0; border-bottom:1px solid #f0ede7; }
+.admissions-doc-row:last-child { border-bottom:0; }
+.doc-check { width:31px; height:31px; border-radius:9px; background:#f5eee3; color:#99754c; display:grid; place-items:center; flex:none; }
+.doc-check.complete { background:#e8efe8; color:#4e7962; }
+.doc-check svg { width:15px; height:15px; }
+.doc-details { flex:1; min-width:0; }
+.doc-details strong { display:block; color:#34434a; font-size:11px; line-height:1.45; }
+.doc-details small { display:block; color:#898f8b; font-size:9px; line-height:1.5; margin-top:3px; }
+.admissions-doc-row .chip { font-size:8px; }
+.interview-card .panel-kicker { display:flex; align-items:center; gap:7px; color:#7b8e7f; }
+.interview-card .panel-kicker svg { width:13px; height:13px; }
+.interview-card h2,.decision-panel h2 { margin-bottom:13px; }
+.interview-invite { display:flex; flex-direction:column; gap:3px; padding:10px 12px; border:1px solid #e5ddc9; background:#f8f4e9; border-radius:9px; margin:0 0 13px; }
+.interview-invite strong { color:#77623f; font-size:10px; }
+.interview-invite span { color:#48574f; font-size:11px; }
+.updates-card .panel-header { margin-bottom:9px; }
+.officer-update { position:relative; padding:13px 0 14px 13px; border-left:1px solid #d9d8ca; border-bottom:1px solid #f0ede7; }
+.officer-update:last-child { border-bottom:0; }
+.officer-update:before { content:""; position:absolute; width:7px; height:7px; left:-4px; top:17px; border-radius:50%; background:#668675; box-shadow:0 0 0 3px #eaf0e9; }
+.update-date { display:block; color:#89918b; font:9px var(--app-font-mono); margin-bottom:5px; }
+.officer-update strong { color:#34464a; font-size:11px; }
+.officer-update p { color:#76817c; font-size:10px; line-height:1.55; margin:4px 0 0; }
+.admissions-empty { padding:20px 7px; }
+.admissions-empty svg { width:18px; height:18px; }
+.offer-card { display:flex; align-items:center; gap:17px; padding:21px; margin-top:17px; border-radius:14px; background:#315e54; color:#f5f1e7; }
+.offer-mark { width:40px; height:40px; flex:none; border:1px solid #d8c58c; border-radius:50%; display:grid; place-items:center; color:#e5d094; }
+.offer-mark svg { width:19px; height:19px; }
+.offer-copy { min-width:0; flex:1; }
+.offer-copy .role-preview-overline { margin:0 0 5px; }
+.offer-copy h2 { color:#faf4e8; margin:0 0 5px; }
+.offer-copy p { color:#d4e0d8; font-size:10px; line-height:1.5; margin:0 0 8px; }
+.offer-copy .chip { background:#ffffff21; color:#fff7e4; }
+.offer-actions { width:min(340px,40%); display:flex; gap:8px; align-items:center; }
+.offer-actions .field { flex:1; min-width:0; }
+.offer-actions .btn { flex:none; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.queue-panel { margin-bottom:16px; }
+.admissions-queue { border-top:1px solid #eeeae1; }
+.admissions-queue-row { width:100%; display:grid; grid-template-columns:34px minmax(150px,1fr) minmax(125px,.75fr) auto; align-items:center; gap:13px; padding:13px 11px; border:0; border-bottom:1px solid #f0ede7; background:transparent; text-align:left; cursor:pointer; transition:background .16s,transform .16s; }
+.admissions-queue-row:hover { background:#f8f7f1; }
+.admissions-queue-row.selected { background:#eef3ed; box-shadow:inset 3px 0 #477564; }
+.queue-index { color:#89948c; font:500 10px var(--app-font-mono); }
+.queue-person { min-width:0; }
+.queue-person strong,.queue-person small { display:block; }
+.queue-person strong { color:#34454a; font-size:11px; }
+.queue-person small { color:#87908a; font-size:9px; margin-top:4px; }
+.queue-entry { color:#74817a; font-size:10px; }
+.queue-scope { color:#818983; font-size:9px; margin-top:12px; }
+.case-heading { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:18px 21px; margin-bottom:16px; background:#315e54; }
+.case-heading .profile-eyebrow { margin-bottom:7px; }
+.case-heading h2 { font-size:20px; }
+.case-heading-status { display:flex; flex-direction:column; align-items:flex-end; gap:7px; }
+.case-heading-status .chip { background:#ffffff20; color:#fff6dd; }
+.case-label { color:#c2d2c6; font:9px var(--app-font-mono); text-transform:uppercase; letter-spacing:.08em; }
+.officer-work-grid { align-items:start; }
+.action-strip { padding-top:15px; border-top:1px solid #eeeae1; margin-top:11px; }
+.inline-action { display:flex; align-items:center; gap:8px; }
+.inline-action .field { flex:1; min-width:0; }
+.inline-action .btn { flex:none; }
+.field-hint { color:#989d97; font-weight:400; margin-left:4px; }
+.rubric-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.rubric-control { display:block; }
+.rubric-control > label { display:block; color:#485850; font:700 10px var(--app-font-sans); margin-bottom:3px; }
+.rubric-control > p { display:block; color:#89918b; font:9px var(--app-font-sans); min-height:25px; line-height:1.4; margin:0 0 7px; }
+.review-field { display:block; margin-top:14px; }
+.review-field > label { display:block; color:#546064; font:600 11px var(--app-font-sans); margin:0 0 7px; }
+.review-field > p { color:#a65543; font-size:10px; line-height:1.4; margin:5px 0 0; }
+.review-notes { min-height:91px; resize:vertical; line-height:1.5; }
+.review-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:13px; }
+.review-footer > span { color:#919791; font-size:9px; line-height:1.4; }
+.officer-side-stack { position:sticky; top:18px; }
+.full-button { width:100%; margin-top:11px; }
+.decision-panel .subtitle { font-size:10px; margin:0 0 13px; }
+.decision-buttons { display:grid; grid-template-columns:1fr; gap:7px; }
+.decision-button { min-height:39px; display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid #e3ded4; border-radius:8px; background:#fffefa; color:#485650; text-align:left; font:600 10px var(--app-font-sans); cursor:pointer; transition:background .16s,border-color .16s,transform .16s; }
+.decision-button:hover { transform:translateX(2px); border-color:#abc0b1; background:#f3f6ef; }
+.decision-button.chosen { border-color:#6b917b; background:#edf3eb; color:#315e54; }
+.decision-button svg { width:15px; height:15px; color:#668675; }
+.decision-result { display:flex; align-items:center; gap:8px; padding:9px 10px; margin-top:11px; border-radius:8px; background:#eaf1e9; color:#4b6f59; font-size:10px; }
+.decision-result svg { width:15px; height:15px; }
+.decision-result strong { color:#315e54; }
+.case-updates .panel-header { margin-bottom:4px; }
+.officer-update.compact { padding-top:11px; padding-bottom:11px; }
+.officer-update.compact:before { top:15px; }
+@media(max-width:760px) {
+ .applicant-profile { padding:20px; }
+ .applicant-seal { width:53px; height:53px; margin-left:12px; }
+ .applicant-seal span { font-size:18px; }
+ .applicant-facts { gap:16px; }
+ .journey-list { grid-template-columns:1fr; gap:0; }
+ .journey-list li { min-height:65px; display:grid; grid-template-columns:29px 1fr; align-items:start; column-gap:11px; padding:0; }
+ .journey-marker { grid-row:1; }
+ .journey-copy { grid-column:2; padding-top:1px; }
+ .journey-line { left:13px; right:auto; top:27px; bottom:0; height:auto; width:1px; }
+ .offer-card { align-items:flex-start; flex-wrap:wrap; }
+ .offer-actions { width:100%; }
+ .admissions-queue-row { grid-template-columns:25px 1fr auto; gap:8px; }
+ .queue-entry { display:none; }
+ .admissions-queue-row > span:last-child { grid-column:3; grid-row:1; }
+ .case-heading { align-items:flex-start; }
+ .case-heading-status { align-items:flex-end; }
+ .case-heading .chip { white-space:normal; text-align:right; }
+ .officer-side-stack { position:static; }
+ .rubric-grid { grid-template-columns:1fr; }
+}
+@media(max-width:460px) {
+ .page-heading { flex-direction:column; }
+ .page-heading > .btn { align-self:flex-start; }
+ .applicant-title-row { flex-direction:column; }
+ .applicant-title-row h2 { font-size:20px; }
+ .applicant-facts { display:grid; grid-template-columns:1fr 1fr; }
+ .applicant-seal { display:none; }
+ .admissions-doc-row { align-items:flex-start; }
+ .admissions-doc-row .chip { white-space:normal; text-align:right; }
+ .inline-action { align-items:stretch; flex-direction:column; }
+ .inline-action .btn { width:100%; }
+ .review-footer { align-items:flex-start; flex-direction:column; }
+ .review-footer .btn { width:100%; }
+ .case-heading { flex-direction:column; }
+ .case-heading-status { align-items:flex-start; }
+ .case-heading .chip { text-align:left; }
+ .offer-actions { flex-direction:column; align-items:stretch; }
+}
 @keyframes fade {from{opacity:0}to{opacity:1}}
 @keyframes rise {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:1100px) {

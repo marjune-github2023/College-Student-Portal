@@ -51,7 +51,7 @@ export function LoginPage() {
   </main>;
 }
 
-function RoleContentsGuide({ role, heading = 'What belongs in this workspace' }: { role: DemoRole; heading?: string }) {
+export function RoleContentsGuide({ role, heading = 'What belongs in this workspace' }: { role: DemoRole; heading?: string }) {
   return <section className="panel panel-pad role-contents-panel" aria-label={`${role.name} workspace contents`} data-testid={`role-contents-${role.slug}`}>
     <div className="panel-header"><div><div className="panel-kicker">{role.name} · role guide</div><h2>{heading}</h2></div></div>
     <div className="role-contents-grid">
