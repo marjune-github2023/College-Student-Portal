@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../components/PortalUI';
-import { courses, courseOptions, documents, grades, initialRequests, requirements, student, type Request } from '../data';
+import { useServiceRequests, useStudentOverview } from '../lib/portalData';
+import type { Request } from '../lib/portalTypes';
 
 function toneFor(status: string) {
   if (/official|satisfied|complete|approved|enrolled/i.test(status)) return 'green' as const;
@@ -11,23 +12,31 @@ function toneFor(status: string) {
   return 'gray' as const;
 }
 
-function CurrentTerm() {
-  return <div className="panel panel-pad"><div className="panel-kicker">Current term</div><div style={{ fontSize: 13, fontWeight: 700, color: '#304149' }}>Second Semester</div><div className="stat-foot">Academic year 2025–26 <span aria-hidden="true">·</span> Week 8 of 16</div></div>;
+function CurrentTerm({ term, currentWeek, totalWeeks }: { term: string; currentWeek: number | null; totalWeeks: number | null }) {
+  const [semester, academicYear] = term.split(' · ');
+  return <div className="panel panel-pad"><div className="panel-kicker">Current term</div><div style={{ fontSize: 13, fontWeight: 700, color: '#304149' }}>{semester}</div><div className="stat-foot">{academicYear}{currentWeek && totalWeeks ? <> <span aria-hidden="true">·</span> Week {currentWeek} of {totalWeeks}</> : null}</div></div>;
 }
 
 export function StudentDashboard() {
   const { announce, toast } = useNotice();
+  const { student, courses, requirements, documents } = useStudentOverview();
+  const enrolledUnits = courses.reduce((sum, course) => sum + course.units, 0);
+  const progressPercent = Math.round((student.completedUnits / student.totalUnits) * 100);
+  const outstanding = documents.filter((document) => document.status !== 'Complete');
+  const inProgress = requirements.filter((item) => item.status === 'In progress').length;
+  const remaining = requirements.filter((item) => item.status === 'Remaining').length;
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   return <main className="main-content">
-    <PageHeading eyebrow="Tuesday, March 24, 2026 · Student home" title={<>Good morning, <span style={{ color: '#427260' }}>Mara.</span></>} subtitle="A clear view of what’s next in your semester." />
+    <PageHeading eyebrow={`${today} · Student home`} title={<>Good morning, <span style={{ color: '#427260' }}>{student.name.split(' ')[0]}.</span></>} subtitle="A clear view of what’s next in your semester." />
     <section className="hero-card" aria-label="Student profile summary">
       <div className="hero-top"><span className="hero-tag">Your academic snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
       <div className="hero-name"><h2>{student.program}</h2><p>Keep your semester moving. Your progress and next steps are gathered here, with official records clearly labeled.</p><button className="btn btn-secondary btn-small" onClick={() => announce('Student profile details are shown in this local demo.')}>View student details <ArrowRight /></button></div>
       <div className="hero-symbol"><span>{student.studentId}</span><span>{student.yearLevel}</span><span>{student.standing}</span></div>
     </section>
     <div className="grid overview-grid section-space">
-      <CurrentTerm />
-      <div className="panel panel-pad"><div className="panel-kicker">Enrolled units</div><div className="stat-value">13 <span style={{ fontSize: 14, fontWeight: 500, color: '#8a908d' }}>/ 18</span></div><div className="stat-foot"><CalendarDays size={13} /> Active schedule this term</div></div>
-      <div className="panel panel-pad"><div className="panel-kicker">Degree progress</div><div className="stat-value">68<span style={{ fontSize: 17 }}>%</span></div><div className="stat-foot"><ArrowDownRight size={13} /> 82 of 120 units completed</div></div>
+      <CurrentTerm term={student.term} currentWeek={student.currentWeek} totalWeeks={student.totalWeeks} />
+      <div className="panel panel-pad"><div className="panel-kicker">Enrolled units</div><div className="stat-value">{enrolledUnits} <span style={{ fontSize: 14, fontWeight: 500, color: '#8a908d' }}>units</span></div><div className="stat-foot"><CalendarDays size={13} /> Active schedule this term</div></div>
+      <div className="panel panel-pad"><div className="panel-kicker">Degree progress</div><div className="stat-value">{progressPercent}<span style={{ fontSize: 17 }}>%</span></div><div className="stat-foot"><ArrowDownRight size={13} /> {student.completedUnits} of {student.totalUnits} units completed</div></div>
     </div>
     <div className="grid two-col section-space">
       <section className="panel panel-pad">
@@ -36,11 +45,11 @@ export function StudentDashboard() {
       </section>
       <div className="grid" style={{ gap: 16 }}>
         <section className="panel panel-pad"><div className="panel-header"><div><div className="panel-kicker">To keep in mind</div><h2>Next steps</h2></div><Bell size={17} color="#8c9b8f" /></div>
-          <div className="alert-row"><div className="alert-icon"><FileCheck2 /></div><div><strong>Two documents need attention</strong><p>Health clearance and student photo are still outstanding.</p><Link className="link" href="/student/documents">Review checklist →</Link></div></div>
+          <div className="alert-row"><div className="alert-icon"><FileCheck2 /></div><div><strong>{outstanding.length} document{outstanding.length === 1 ? '' : 's'} need{outstanding.length === 1 ? 's' : ''} attention</strong><p>{outstanding.map((document) => document.name).join(' · ')}</p><Link className="link" href="/student/documents">Review checklist →</Link></div></div>
           <div className="alert-row"><div className="alert-icon" style={{ background: '#e7eee8', color: '#507661' }}><GraduationCap /></div><div><strong>Enrollment window is open</strong><p>Review your draft courses before submitting.</p><Link className="link" href="/student/enrollment">Plan your term →</Link></div></div>
         </section>
         <section className="panel panel-pad"><div className="panel-header"><div><div className="panel-kicker">Progress snapshot</div><h2>On your way</h2></div><Link className="link" href="/student/progress">Audit →</Link></div>
-          <div className="progress-label"><strong>82 <span style={{ fontSize: 13, fontWeight: 500 }}>units</span></strong><span>of 120 required</span></div><div className="progress-track"><div className="progress-fill" style={{ width: '68%' }} /></div><p className="tagline-note">4 requirements in progress · 3 remaining</p>
+          <div className="progress-label"><strong>{student.completedUnits} <span style={{ fontSize: 13, fontWeight: 500 }}>units</span></strong><span>of {student.totalUnits} required</span></div><div className="progress-track"><div className="progress-fill" style={{ width: `${progressPercent}%` }} /></div><p className="tagline-note">{inProgress} requirements in progress · {remaining} remaining</p>
         </section>
       </div>
     </div>
@@ -51,7 +60,8 @@ export function StudentDashboard() {
 
 export function EnrollmentPage() {
   const { announce, toast } = useNotice();
-  const [term, setTerm] = useState('Second Semester · AY 2025–26');
+  const { student, courses, courseOptions } = useStudentOverview();
+  const [term, setTerm] = useState(student.term);
   const [selected, setSelected] = useState<string[]>(courses.map((course) => course.code));
   const [step, setStep] = useState(0);
   const [modal, setModal] = useState(false);
@@ -118,6 +128,7 @@ export function EnrollmentPage() {
 }
 
 export function GradesPage() {
+  const { grades } = useStudentOverview();
   const [term, setTerm] = useState('All terms');
   const filtered = grades.filter((grade) => term === 'All terms' || grade.term === term);
   const terms = ['All terms', ...Array.from(new Set(grades.map((grade) => grade.term)))];
@@ -139,13 +150,14 @@ export function GradesPage() {
 }
 
 export function ProgressPage() {
+  const { student, requirements } = useStudentOverview();
   const [filter, setFilter] = useState('All requirements');
   const filtered = requirements.filter((item) => filter === 'All requirements' || item.status === filter);
   const done = requirements.filter((item) => item.status === 'Satisfied').reduce((sum,item) => sum + item.units, 0);
   return <main className="main-content">
     <PageHeading eyebrow="Student workspace · Degree audit" title="Your degree progress" subtitle="A planning view of curriculum requirements. Confirm official completion with the Registrar." action={<span className="demo-tag"><span className="demo-dot" />AUDIT PREVIEW</span>} />
     <div className="grid" style={{ gridTemplateColumns:'minmax(0,1.4fr) minmax(220px,.65fr)', gap:17, marginBottom:18 }}>
-      <section className="panel panel-pad"><div className="panel-kicker">{student.program} · {student.curriculumVersion}</div><div className="progress-label"><strong>82 <span style={{ fontSize:14,fontWeight:500 }}>units completed</span></strong><span>of 120 required</span></div><div className="progress-track"><div className="progress-fill" style={{ width:'68%' }} /></div><div className="detail-row" style={{ marginTop:14 }}><span>Completed requirements</span><strong>{done} units listed as satisfied</strong></div><p className="tagline-note">Totals are illustrative; this preview does not replace an official graduation evaluation.</p></section>
+      <section className="panel panel-pad"><div className="panel-kicker">{student.program} · {student.curriculumVersion}</div><div className="progress-label"><strong>{student.completedUnits} <span style={{ fontSize:14,fontWeight:500 }}>units completed</span></strong><span>of {student.totalUnits} required</span></div><div className="progress-track"><div className="progress-fill" style={{ width:`${Math.round((student.completedUnits / student.totalUnits) * 100)}%` }} /></div><div className="detail-row" style={{ marginTop:14 }}><span>Completed requirements</span><strong>{done} units listed as satisfied</strong></div><p className="tagline-note">Totals are illustrative; this preview does not replace an official graduation evaluation.</p></section>
       <div className="queue-stat"><span>Curriculum status</span><strong style={{ fontSize:17 }}>On track</strong><div style={{ marginTop:9 }}><Badge tone="green">No holds in sample</Badge></div></div>
     </div>
     <section className="panel panel-pad">
@@ -159,6 +171,7 @@ export function ProgressPage() {
 
 export function DocumentsPage() {
   const { announce, toast } = useNotice();
+  const { documents } = useStudentOverview();
   const [complete, setComplete] = useState<string[]>(documents.filter((item) => item.status === 'Complete').map((item) => item.name));
   const [modal, setModal] = useState('');
   const [draftRequests, setDraftRequests] = useState<{ type:string; ref:string }[]>([]);
@@ -195,7 +208,8 @@ export function DocumentsPage() {
 }
 
 export function RegistrarDashboard() {
-  const [requests, setRequests] = useState<Request[]>(initialRequests);
+  const requestQueue = useServiceRequests();
+  const [requests, setRequests] = useState<Request[]>(requestQueue);
   const [filter, setFilter] = useState('All work');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Request | null>(null);
@@ -239,5 +253,3 @@ export function RegistrarDashboard() {
     {toast}
   </main>;
 }
-
-export { EnhancedWorkspace as RoleWorkspacePage } from '../components/EnhancedWorkspace';

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { ArrowRight, CircleHelp, FileCheck2, FileText, Search, ShieldCheck, Users, X } from 'lucide-react';
 import { Badge, Modal, PageHeading, useNotice } from '../../components/PortalUI';
-import { workspacePreviews, type WorkspaceItem } from '../../data';
+import { useWorkspace } from '../../lib/portalData';
+import type { WorkspaceItem } from '../../lib/portalTypes';
 
-const wp = (slug: string) => workspacePreviews.find((p) => p.slug === slug)!;
+const wp = useWorkspace;
 
 function toneFor(status: string) {
   if (/indexed|complete|ready|approved/i.test(status)) return 'green' as const;

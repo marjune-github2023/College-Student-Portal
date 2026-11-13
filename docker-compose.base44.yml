@@ -62,6 +62,20 @@ services:
     command: ["sh", "-ec", "node lib/db/seed.mjs"]
     restart: "no"
 
+  # One-shot: loads the portal's academic records and per-role workspace content
+  # from lib/db/data/portal-seed.json. Safe to re-run; user accounts are untouched.
+  seed-portal:
+    <<: *app-base
+    environment:
+      - DATABASE_URL=postgresql://campus:campus_dev@postgres:5432/campus
+    depends_on:
+      db-push:
+        condition: service_completed_successfully
+      seed-users:
+        condition: service_completed_successfully
+    command: ["sh", "-ec", "node lib/db/seed-portal.mjs"]
+    restart: "no"
+
   api-server:
     <<: *app-base
     environment:
@@ -77,6 +91,8 @@ services:
       postgres:
         condition: service_healthy
       seed-users:
+        condition: service_completed_successfully
+      seed-portal:
         condition: service_completed_successfully
     command: ["sh", "-c", "pnpm --filter @workspace/api-server run dev"]
     ports:

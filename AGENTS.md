@@ -3,9 +3,9 @@
 ## Project Overview
 Northfield College Campus Portal — a pnpm monorepo for a student/registrar portal.
 
-- **Frontend**: `artifacts/campus-portal` — Vite + React 19 + wouter + Tailwind v4. Served on host port 3000 (internal 5173). Dashboard content is still sample data from `src/data.ts`; authentication is real (see below).
-- **API**: `artifacts/api-server` — Express 5, bundled with esbuild. Host port 8000 (internal 5000). Exposes `/api/healthz`, `/api/auth/*` and `/api/admin/users*`.
-- **DB**: `lib/db` — Drizzle ORM + PostgreSQL. `users` and `sessions` tables in `src/schema/auth.ts`; password/session crypto in `password.mjs`.
+- **Frontend**: `artifacts/campus-portal` — Vite + React 19 + wouter + Tailwind v4. Served on host port 3000 (internal 5173). Every dashboard reads the API through `src/lib/portalData.ts` (React Query + Suspense); no dashboard data is hardcoded in the frontend.
+- **API**: `artifacts/api-server` — Express 5, bundled with esbuild. Host port 8000 (internal 5000). Exposes `/api/healthz`, `/api/auth/*`, `/api/admin/users*` and `/api/portal/*`.
+- **DB**: `lib/db` — Drizzle ORM + PostgreSQL. `users`/`sessions` in `src/schema/auth.ts`; portal domain tables in `src/schema/portal.ts` (programs, terms, students, courses, enrollments, grades, degree_requirements, student_requirements, student_documents, service_requests, workspaces, workspace_metrics, workspace_items, workspace_widget_rows). Password/session crypto lives in `password.mjs`.
 - **API client**: `lib/api-client-react` — Orval-generated React Query hooks. Not imported by the frontend (the portal uses `src/lib/api.ts`).
 
 ## Running
@@ -14,7 +14,8 @@ docker compose -f docker-compose.base44.yml up -d --build
 ```
 - Web preview: http://localhost:3000
 - API health: http://localhost:8000/api/healthz
-- One-shot services: `db-push` (drizzle schema) then `seed-users` (dev accounts) run before `api-server` starts.
+- One-shot services: `db-push` (drizzle schema) → `seed-users` (dev accounts) → `seed-portal` (portal data) run before `api-server` starts.
+- `seed-portal` loads `lib/db/data/portal-seed.json` into the portal tables. It truncates and reloads that demo content on every run; `users` and `sessions` are never touched. Edit the JSON (or the tables) to change dashboard content.
 
 ## Authentication model
 - **Accounts**: one row per person in `users` (email unique, exactly one `role`, scrypt-hashed password via `lib/db/password.mjs`). Roles are listed in `artifacts/api-server/src/lib/roles.ts` and mirrored in `artifacts/campus-portal/src/lib/roles.ts`.
@@ -46,8 +47,11 @@ docker compose -f docker-compose.base44.yml up -d --build
 - The API server `dev` script builds with esbuild then starts (`build && start`) — no live reload. Restart the service after API code changes.
 - `lib/db` is a TypeScript project referenced by `api-server`; run `pnpm run typecheck:libs` before `pnpm --filter @workspace/api-server run typecheck`, otherwise tsc complains that `lib/db/dist` is missing.
 - Schema changes: `pnpm --filter @workspace/db run push-force` (the `db-push` compose service does this on boot).
+- Dashboard content is database-driven: role dashboards call `GET /api/portal/workspaces`, student pages call `GET /api/portal/student/overview`, and the registrar queue calls `GET /api/portal/service-requests`. To change what a dashboard shows, edit the rows in `lib/db/data/portal-seed.json` and re-run `docker compose -f docker-compose.base44.yml up seed-portal`.
+- Portal tables are seeded demo content. The `seed-portal` run replaces them; delete a row in the database and it comes back on the next seed, so durable edits belong in the seed file.
 
 ## Verification
 - Auth smoke test: `curl -i -X POST http://localhost:3000/api/auth/login -H 'Content-Type: application/json' -H 'X-Requested-With: XMLHttpRequest' -d '{"email":"student@northfield.edu","password":"<DEMO_USER_PASSWORD>"}'` should return the student user and set `campus_session`.
 - Role gate: with a student cookie, `GET /api/admin/users` returns 403.
+- Portal data: with a signed-in cookie, `GET /api/portal/workspaces` returns 14 workspaces with items/metrics, `GET /api/portal/student/overview` returns the student record (82 of 120 units, 4 enrolled courses, 5 grades, 9 requirements, 4 documents), and a registrar cookie gets 7 rows from `GET /api/portal/service-requests`.
 - `docker compose -f docker-compose.base44.yml exec -T web sh -ec 'pnpm run typecheck'` must pass.

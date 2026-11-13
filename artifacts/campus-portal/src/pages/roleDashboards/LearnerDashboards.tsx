@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, GraduationCap, ShieldCheck, TriangleAlert, Upload, X } from 'lucide-react';
 import { Badge, Modal, PageHeading, useNotice } from '../../components/PortalUI';
-import { workspacePreviews, type WorkspaceItem } from '../../data';
+import { useWorkspace } from '../../lib/portalData';
+import type { WorkspaceItem } from '../../lib/portalTypes';
 
-const wp = (slug: string) => workspacePreviews.find((p) => p.slug === slug)!;
+const wp = useWorkspace;
 
 /* ── Applicant ─────────────────────────────────────────────── */
 

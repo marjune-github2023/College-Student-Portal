@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { ArrowRight, CalendarDays, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Search, TriangleAlert, Users, X } from 'lucide-react';
 import { Badge, Modal, PageHeading, useNotice } from '../../components/PortalUI';
-import { workspacePreviews, type WorkspaceItem } from '../../data';
+import { useWorkspace } from '../../lib/portalData';
+import type { WorkspaceItem } from '../../lib/portalTypes';
 
-const wp = (slug: string) => workspacePreviews.find((p) => p.slug === slug)!;
+const wp = useWorkspace;
 
 function toneFor(status: string) {
   if (/complete|approved|enrolled|ready|indexed/i.test(status)) return 'green' as const;

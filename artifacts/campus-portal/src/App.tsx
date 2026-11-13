@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -24,6 +24,7 @@ function HomeRoute() {
 function Router() {
   return <PortalShell>
     <RoutedErrorBoundary>
+      <Suspense fallback={<main className="main-content"><div className="eyebrow">Northfield College · Campus Portal</div><h1>Loading your workspace</h1><p className="subtitle">Fetching the latest records…</p></main>}>
       <Switch>
         <Route path="/login" component={LoginPage} />
         <Route path="/" component={HomeRoute} />
@@ -61,6 +62,7 @@ function Router() {
           <main className="main-content"><div className="eyebrow">Northfield College · Campus Portal</div><h1>Page not found</h1><p className="subtitle">That address is not part of this portal.</p><Link className="btn btn-primary" href="/" style={{ marginTop: 18 }}>Go to my dashboard</Link></main>
         </Route>
       </Switch>
+      </Suspense>
     </RoutedErrorBoundary>
   </PortalShell>;
 }
