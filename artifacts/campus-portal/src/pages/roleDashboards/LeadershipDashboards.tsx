@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ArrowRight, Bell, CalendarDays, CircleHelp, ClipboardList, FileText, GraduationCap, Users } from 'lucide-react';
-import { Link } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../../components/PortalUI';
 import { workspacePreviews, type WorkspaceItem } from '../../data';
 
@@ -22,7 +21,7 @@ export function AdviserDashboard() {
   }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Adviser profile summary">
       <div className="hero-top"><span className="hero-tag">Your advising snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -61,7 +60,7 @@ export function AdviserDashboard() {
           <div className="detail-row"><span>Curriculum version</span><strong>2023 cohort</strong></div>
           <div className="detail-row"><span>Referral pathway</span><strong>Registrar · audit question</strong></div>
         </section>
-        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+        <div className="role-demo-stamp"><span className="demo-dot" /> Preview environment · sample data · not live records</div>
       </aside>
     </div>
 
@@ -101,7 +100,7 @@ export function ProgramHeadDashboard() {
   }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Department profile summary">
       <div className="hero-top"><span className="hero-tag">Department snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -141,7 +140,7 @@ export function ProgramHeadDashboard() {
           <div className="detail-row"><span>Assessment cycle</span><strong>AY 2025–26</strong></div>
           <div className="detail-row"><span>Assessment due</span><strong>Apr 15</strong></div>
         </section>
-        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+        <div className="role-demo-stamp"><span className="demo-dot" /> Preview environment · sample data · not live records</div>
       </aside>
     </div>
 
@@ -181,7 +180,7 @@ export function AcademicAdminDashboard() {
   }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Academic affairs summary">
       <div className="hero-top"><span className="hero-tag">Academic affairs snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -220,7 +219,7 @@ export function AcademicAdminDashboard() {
           <div className="detail-row"><span>Summer term opens</span><strong>Jun 08</strong></div>
           <div className="detail-row"><span>Policy council</span><strong>Apr 09</strong></div>
         </section>
-        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+        <div className="role-demo-stamp"><span className="demo-dot" /> Preview environment · sample data · not live records</div>
       </aside>
     </div>
 

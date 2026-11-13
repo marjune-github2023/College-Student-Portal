@@ -1,54 +1,14 @@
 import { useMemo, useState } from 'react';
-import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Landmark, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
+import { ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Flag, GraduationCap, Search, ShieldCheck, TriangleAlert, Upload, Users, X } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../components/PortalUI';
-import { courses, courseOptions, demoRoles, documents, grades, initialRequests, requirements, student, type Request } from '../data';
+import { courses, courseOptions, documents, grades, initialRequests, requirements, student, type Request } from '../data';
 
 function toneFor(status: string) {
   if (/official|satisfied|complete|approved|enrolled/i.test(status)) return 'green' as const;
   if (/provisional|progress|queue|awaiting|open/i.test(status)) return 'amber' as const;
   if (/needed|review|remaining|waitlist|high/i.test(status)) return 'red' as const;
   return 'gray' as const;
-}
-
-export function LoginPage() {
-  const [, setLocation] = useLocation();
-  const [roleQuery, setRoleQuery] = useState('');
-  const groups = Array.from(new Set(demoRoles.map((role) => role.group)));
-  const normalizedQuery = roleQuery.trim().toLowerCase();
-  const matchingRoles = demoRoles.filter((role) => `${role.name} ${role.group} ${role.summary}`.toLowerCase().includes(normalizedQuery));
-  return <main className="login-page">
-    <section className="login-story" aria-label="Northfield College introduction">
-      <Link className="login-brand" href="/" aria-label="Northfield College Campus Portal"><span className="brand-mark">N</span><span><span className="brand-name">Northfield College</span><span className="brand-sub" style={{ display:'block' }}>Campus portal</span></span></Link>
-      <div className="login-quote"><div className="login-overline">A clearer way through college</div><h1>Know where you are. <span>See what comes next.</span></h1><p>One welcoming place to understand academic plans, official records, and the steps between them.</p></div>
-      <div className="login-orbit" aria-hidden="true"><Landmark /></div>
-      <div className="login-story-foot">NORTHFIELD COLLEGE · STUDENT & REGISTRAR PORTAL</div>
-    </section>
-    <section className="login-main" aria-labelledby="login-heading">
-      <div className="login-card">
-        <div className="eyebrow">Campus portal · role preview</div>
-        <h2 id="login-heading">Choose a demo workspace.</h2>
-        <p className="subtitle">Explore role-specific screens built from fictional examples in the College Admission-to-TOR guide.</p>
-        <div className="login-alert" role="note"><ShieldCheck /><div><strong style={{ display:'block', marginBottom:2 }}>Demo preview · sample data · not live.</strong>No account is authenticated. Choosing a role only opens its fictional workspace; it does not sign in or grant access to a real system.</div></div>
-        <Link className="btn btn-primary login-continue" href="/" data-testid="button-continue-demo">Continue to demo workspace <ArrowRight /></Link>
-        <p className="login-footnote" style={{ marginTop:8, marginBottom:18 }}>Opens the Student dashboard. Or choose any role preview below.</p>
-        <label className="role-search-label" htmlFor="role-search">Find a role</label>
-        <div className="role-search-wrap"><Search aria-hidden="true" /><input id="role-search" className="field" type="search" placeholder="Search roles or responsibilities…" value={roleQuery} onChange={(event) => setRoleQuery(event.target.value)} autoComplete="off" data-testid="input-role-search" /></div>
-        <div className="role-groups">
-          {groups.map((group) => {
-            const roles = matchingRoles.filter((role) => role.group === group);
-            if (!roles.length) return null;
-            return <section className="role-group" key={group} aria-label={group}>
-              <div className="role-group-heading">{group}<span>{roles.length.toString().padStart(2,'0')}</span></div>
-              <div className="role-grid">{roles.map((role) => <button key={role.slug} type="button" className="role-option" onClick={() => setLocation(role.route)} aria-label={`Open ${role.name} demo preview`} data-testid={`button-role-${role.slug}`}><span className="role-option-copy"><strong>{role.name}</strong><small>{role.summary}</small></span><ArrowRight aria-hidden="true" /></button>)}</div>
-            </section>;
-          })}
-          {matchingRoles.length === 0 && <div className="role-empty" role="status"><Search /><strong>No matching roles</strong><span>Try a role title or responsibility keyword.</span></div>}
-        </div>
-        <p className="login-footnote">All role previews are local interface samples using fictional data. Applicant, Student, Registrar, and staff views are distinct demo workspaces.</p>
-      </div>
-    </section>
-  </main>;
 }
 
 function CurrentTerm() {

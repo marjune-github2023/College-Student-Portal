@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ArrowRight, Bell, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, GraduationCap, ShieldCheck, TriangleAlert, Upload, X } from 'lucide-react';
-import { Link } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../../components/PortalUI';
 import { workspacePreviews, type WorkspaceItem } from '../../data';
 
@@ -26,7 +25,7 @@ export function ApplicantDashboard() {
   const upcoming = data.items.filter((i) => i.status.includes('Upcoming'));
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login" data-testid="button-return-role-selector">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Applicant profile summary">
       <div className="hero-top"><span className="hero-tag">Your application snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -66,7 +65,7 @@ export function ApplicantDashboard() {
           <div className="detail-row"><span>In review</span><strong>{inReview.length}</strong></div>
           <div className="detail-row"><span>Upcoming</span><strong>{upcoming.length}</strong></div>
         </section>
-        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+        <div className="role-demo-stamp"><span className="demo-dot" /> Preview environment · sample data · not live records</div>
       </aside>
     </div>
 
@@ -108,7 +107,7 @@ export function InstructorDashboard() {
   const needsReview = data.items.filter((i) => i.status.includes('review') || i.status.includes('Needs'));
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Instructor profile summary">
       <div className="hero-top"><span className="hero-tag">Your teaching snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -147,7 +146,7 @@ export function InstructorDashboard() {
           <div className="detail-row"><span>Advising week</span><strong>Apr 20–24</strong></div>
           <div className="detail-row"><span>Final exam week</span><strong>May 18–23</strong></div>
         </section>
-        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+        <div className="role-demo-stamp"><span className="demo-dot" /> Preview environment · sample data · not live records</div>
       </aside>
     </div>
 

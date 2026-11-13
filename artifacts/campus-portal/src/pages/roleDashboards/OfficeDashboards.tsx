@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ArrowRight, CalendarDays, CheckCircle2, CircleHelp, ClipboardList, FileCheck2, FileText, Search, TriangleAlert, Users, X } from 'lucide-react';
-import { Link } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../../components/PortalUI';
 import { workspacePreviews, type WorkspaceItem } from '../../data';
 
@@ -38,7 +37,7 @@ export function AdmissionsDashboard() {
   }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Admissions office summary">
       <div className="hero-top"><span className="hero-tag">Admissions intake snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -103,7 +102,7 @@ export function RecordsDashboard() {
   function confirmAction() { if (!activeItem) return; announce('Sample record previewed. No credential was issued.'); setActiveItem(null); setConfirmed(false); }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Records office summary">
       <div className="hero-top"><span className="hero-tag">Records workbench snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -163,7 +162,7 @@ export function FinanceDashboard() {
   function confirmAction() { if (!activeItem) return; announce('Sample finance item previewed. No payment was collected.'); setActiveItem(null); setConfirmed(false); }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Finance office summary">
       <div className="hero-top"><span className="hero-tag">Finance desk snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -223,7 +222,7 @@ export function ScholarshipDashboard() {
   function confirmAction() { if (!activeItem) return; announce('Sample scholarship item previewed. No award was approved.'); setActiveItem(null); setConfirmed(false); }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Scholarship office summary">
       <div className="hero-top"><span className="hero-tag">Scholarship review snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -283,7 +282,7 @@ export function OJTDashboard() {
   function confirmAction() { if (!activeItem) return; announce('Sample placement item previewed. No placement was authorized.'); setActiveItem(null); setConfirmed(false); }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="OJT coordination summary">
       <div className="hero-top"><span className="hero-tag">Fieldwork coordination snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -343,7 +342,7 @@ export function ResearchDashboard() {
   function confirmAction() { if (!activeItem) return; announce('Sample research item previewed. No protocol was approved.'); setActiveItem(null); setConfirmed(false); }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Research office summary">
       <div className="hero-top"><span className="hero-tag">Research coordination snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>

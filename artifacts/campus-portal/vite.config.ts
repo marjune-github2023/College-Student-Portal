@@ -72,6 +72,15 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    // Same-origin API so the session cookie is first-party. The API server is
+    // reached inside the compose network; override with API_PROXY_TARGET.
+    proxy: {
+      '/api': {
+        target: process.env.API_PROXY_TARGET ?? 'http://localhost:5000',
+        changeOrigin: false,
+        xfwd: true,
+      },
+    },
   },
   preview: {
     port,

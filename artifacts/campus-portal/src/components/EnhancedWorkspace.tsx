@@ -72,7 +72,7 @@ export function EnhancedWorkspace() {
   );
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${workspace.unit} · DEMO PREVIEW`} title={workspace.heading} subtitle={workspace.intro} action={<Link className="btn btn-outline btn-small" href="/login" data-testid="button-return-role-selector">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${workspace.unit} · DEMO PREVIEW`} title={workspace.heading} subtitle={workspace.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="role-preview-banner">
       <div><span className="role-preview-overline">{role.name} workspace · fictional sample data</span><h2>{workspace.queueTitle}</h2><p>{workspace.queueNote}</p></div>
@@ -115,7 +115,7 @@ export function EnhancedWorkspace() {
             <div className="detail-row"><span>Awaiting action</span><strong>{needsAction}</strong></div>
           </section>
           <section className="notice"><CircleHelp /><div><strong>Preview boundary</strong>{workspace.boundary}</div></section>
-          <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+          <div className="role-demo-stamp"><span className="demo-dot" /> Preview environment · sample data · not live records</div>
         </aside>
       </div>
     </>}
@@ -177,7 +177,7 @@ export function EnhancedWorkspace() {
           <div className="detail-row"><span>Sample items</span><strong>{items.length} fictional records</strong></div>
         </section>
         <section className="notice role-boundary"><CircleHelp /><div><strong>Preview boundary</strong>{workspace.boundary}</div></section>
-        <div className="role-demo-stamp"><span className="demo-dot" /> Demo preview · sample data · not live · no account authenticated</div>
+        <div className="role-demo-stamp"><span className="demo-dot" /> Preview environment · sample data · not live records</div>
       </aside>
     </div>}
 

@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Bell, BookOpen, CalendarDays, Check, ChevronDown, ChevronRight, ClipboardList, FileText, GraduationCap, LayoutDashboard, LogOut, UsersRound, X } from 'lucide-react';
-import { demoRoles } from '../data';
+import { useAuth } from '../lib/auth';
+import { ADMIN_ROLES, homeForRole, roleLabel } from '../lib/roles';
 
 export function Badge({ children, tone }: { children: ReactNode; tone?: 'green' | 'amber' | 'red' | 'gray' }) {
   return <span className={`chip chip-${tone ?? 'gray'}`}>{children}</span>;
@@ -38,40 +39,45 @@ const studentLinks = [
   { href: '/student/progress', label: 'Degree progress', icon: GraduationCap },
   { href: '/student/documents', label: 'Documents', icon: FileText },
 ];
-const staffLinks = [{ href: '/registrar/dashboard', label: 'Staff dashboard', icon: LayoutDashboard }];
 
 export function PortalShell({ children }: { children: ReactNode }) {
   const [location, setLocation] = useLocation();
+  const { user, loading, logout } = useAuth();
   const [sampleNotice, setSampleNotice] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const staff = location.startsWith('/registrar');
-  const workspaceSlug = location.startsWith('/workspace/') ? location.split('/').pop() : '';
-  const activeRole = workspaceSlug ? demoRoles.find((role) => role.slug === workspaceSlug)?.name ?? 'Demo workspace' : staff ? 'Registrar' : 'Student';
-  const roleInitials = activeRole.split(/[\s/]+/).filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+
   if (location === '/login') return <>{children}</>;
-  function signOut() {
+  if (loading) return <div className="app-shell"><div className="shell-main"><main className="main-content" role="status" aria-live="polite"><div className="panel panel-pad"><div className="panel-kicker">Campus portal</div><h2>Checking your session…</h2></div></main></div></div>;
+  if (!user) return <>{children}</>;
+
+  const home = homeForRole(user.role);
+  const isAdmin = ADMIN_ROLES.includes(user.role);
+  const roleLinks = user.role === 'student' ? studentLinks : [{ href: home, label: 'Dashboard', icon: LayoutDashboard }];
+  const links = isAdmin ? [...roleLinks, { href: '/admin/accounts', label: 'Accounts', icon: UsersRound }] : roleLinks;
+  const roleInitials = user.name.split(/[\s.]+/).filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+  const sectionLabel = location === '/admin/accounts' ? 'Account provisioning' : location === home ? 'Dashboard' : 'Workspace';
+
+  async function signOut() {
     setAccountOpen(false);
+    await logout();
     setLocation('/login');
   }
+
   return <div className="app-shell">
     <aside className="sidebar" aria-label="Primary navigation">
-      <Link href="/student/dashboard" className="brand" data-testid="link-campus-home">
+      <Link href={home} className="brand" data-testid="link-campus-home">
         <div className="brand-mark" aria-hidden="true">N</div><div><div className="brand-name">Northfield College</div><div className="brand-sub">Campus portal</div></div>
       </Link>
-      <div className="nav-caption">Student workspace</div>
-      {studentLinks.map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-link ${location === href || (location === '/' && href === '/student/dashboard') ? 'active' : ''}`} aria-current={location === href ? 'page' : undefined} data-testid={`link-${label.toLowerCase().replaceAll(' ', '-')}`}><Icon />{label}</Link>)}
-      <div className="nav-caption">Registrar office</div>
-      {staffLinks.map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-link ${location === href ? 'active' : ''}`} aria-current={location === href ? 'page' : undefined} data-testid="link-registrar-dashboard"><Icon />{label}</Link>)}
-      <div className="nav-caption">Role preview</div>
-      <Link href="/login" className="nav-link" data-testid="link-change-demo-role"><UsersRound />Choose another role</Link>
-      <div className="sidebar-bottom"><div className="profile"><div className="avatar">{roleInitials}</div><div><strong>{activeRole}</strong><small>Demo preview · sample data</small></div></div></div>
+      <div className="nav-caption">{roleLabel(user.role)} workspace</div>
+      {links.map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-link ${location === href ? 'active' : ''}`} aria-current={location === href ? 'page' : undefined} data-testid={`link-${label.toLowerCase().replaceAll(' ', '-')}`}><Icon />{label}</Link>)}
+      <div className="sidebar-bottom"><div className="profile"><div className="avatar">{roleInitials}</div><div><strong>{user.name}</strong><small>{roleLabel(user.role)}</small></div></div></div>
     </aside>
     <div className="shell-main">
-      <header className="topbar"><div className="crumb"><BookOpen size={15} /><strong>{activeRole} preview</strong><ChevronRight size={13} /><span>{staff ? 'Review queue' : workspaceSlug ? 'Role workspace' : 'Academic year 2025–26'}</span></div><div className="top-actions"><span className="demo-tag"><span className="demo-dot" />DEMO PREVIEW</span><button className="icon-button" aria-label="Sample portal notice" title="Sample portal notice" onClick={() => setSampleNotice((value) => !value)}><Bell size={17} /></button><div className="account-wrap"><button className="account-trigger" type="button" aria-haspopup="menu" aria-expanded={accountOpen} aria-controls="account-menu" onClick={() => setAccountOpen((value) => !value)} onKeyDown={(event) => { if (event.key === 'Escape') setAccountOpen(false); }} data-testid="button-account-menu"><span className="account-avatar">{roleInitials}</span><span className="account-label">{activeRole}<small>Preview role</small></span><ChevronDown size={14} /></button>{accountOpen && <div className="account-menu" id="account-menu" role="menu" aria-label="Demo account actions"><div className="account-menu-intro"><strong>{activeRole} demo workspace</strong><span>Sample data · not live</span></div><div className="account-menu-note">No account authenticated. This role selection is a visual preview only.</div><button className="account-menu-action" role="menuitem" onClick={() => { setAccountOpen(false); setLocation('/login'); }} data-testid="button-switch-role"><UsersRound size={15} />Choose another demo role</button><button className="account-menu-action" role="menuitem" onClick={signOut} data-testid="button-sign-out"><LogOut size={15} />Sign out to role selector</button></div>}</div></div></header>
-      <div className="demo-status-line" role="note"><span><strong>Demo preview</strong> · sample data · not live · no account authenticated</span><Link href="/login" data-testid="link-role-selector">Switch role</Link></div>
-      {sampleNotice && <div className="sample-banner" role="status"><span>This portal is showing fictional local sample information.</span><button onClick={() => setSampleNotice(false)} aria-label="Dismiss notice"><X size={14} /></button></div>}
+      <header className="topbar"><div className="crumb"><BookOpen size={15} /><strong>{roleLabel(user.role)}</strong><ChevronRight size={13} /><span>{sectionLabel}</span></div><div className="top-actions"><button className="icon-button" aria-label="Portal notice" title="Portal notice" onClick={() => setSampleNotice((value) => !value)}><Bell size={17} /></button><div className="account-wrap"><button className="account-trigger" type="button" aria-haspopup="menu" aria-expanded={accountOpen} aria-controls="account-menu" onClick={() => setAccountOpen((value) => !value)} onKeyDown={(event) => { if (event.key === 'Escape') setAccountOpen(false); }} data-testid="button-account-menu"><span className="account-avatar">{roleInitials}</span><span className="account-label">{user.name}<small>{roleLabel(user.role)}</small></span><ChevronDown size={14} /></button>{accountOpen && <div className="account-menu" id="account-menu" role="menu" aria-label="Account actions"><div className="account-menu-intro"><strong>{user.name}</strong><span>{user.email}</span></div><div className="account-menu-note">Signed in as {roleLabel(user.role)}. Your role decides which dashboard opens.</div><button className="account-menu-action" role="menuitem" onClick={() => { setAccountOpen(false); setLocation(home); }} data-testid="button-go-to-dashboard"><LayoutDashboard size={15} />My dashboard</button><button className="account-menu-action" role="menuitem" onClick={() => void signOut()} data-testid="button-sign-out"><LogOut size={15} />Sign out</button></div>}</div></div></header>
+      <div className="demo-status-line" role="note"><span><strong>Preview environment</strong> · institutional sample data, not live records</span></div>
+      {sampleNotice && <div className="sample-banner" role="status"><span>This portal is showing sample institutional data while it is being reviewed.</span><button onClick={() => setSampleNotice(false)} aria-label="Dismiss notice"><X size={14} /></button></div>}
       {children}
     </div>
-    <nav className="mobile-bottom" aria-label="Mobile navigation">{[...studentLinks, ...staffLinks].map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={location === href || (location === '/' && href === '/student/dashboard') ? 'active' : ''} aria-label={label} data-testid={`mobile-link-${label.toLowerCase().replaceAll(' ', '-')}`}><Icon /><span>{label === 'Degree progress' ? 'Progress' : label === 'Staff dashboard' ? 'Staff' : label === 'Documents' ? 'Docs' : label}</span></Link>)}</nav>
+    <nav className="mobile-bottom" aria-label="Mobile navigation">{links.map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={location === href ? 'active' : ''} aria-label={label} data-testid={`mobile-link-${label.toLowerCase().replaceAll(' ', '-')}`}><Icon /><span>{label === 'Degree progress' ? 'Progress' : label === 'Documents' ? 'Docs' : label === 'Account provisioning' ? 'Accounts' : label}</span></Link>)}</nav>
   </div>;
 }

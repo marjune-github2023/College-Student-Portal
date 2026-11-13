@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ArrowRight, CircleHelp, FileCheck2, FileText, Search, ShieldCheck, Users, X } from 'lucide-react';
-import { Link } from 'wouter';
 import { Badge, Modal, PageHeading, useNotice } from '../../components/PortalUI';
 import { workspacePreviews, type WorkspaceItem } from '../../data';
 
@@ -27,7 +26,7 @@ export function SystemAdminDashboard() {
   function confirmAction() { if (!activeItem) return; announce('Sample platform item previewed. No system configuration was changed.'); setActiveItem(null); setConfirmed(false); }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="System administration summary">
       <div className="hero-top"><span className="hero-tag">Platform operations snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -84,7 +83,7 @@ export function AuditorDashboard() {
   const filtered = data.items.filter((item) => `${item.reference} ${item.title} ${item.detail}`.toLowerCase().includes(search.toLowerCase()));
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Compliance review summary">
       <div className="hero-top"><span className="hero-tag">Read-only evidence snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
@@ -144,7 +143,7 @@ export function SuperAdminDashboard() {
   function confirmAction() { if (!activeItem) return; announce('Sample governance item previewed. No policy or configuration was changed.'); setActiveItem(null); setConfirmed(false); }
 
   return <main className="main-content">
-    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<Link className="btn btn-outline btn-small" href="/login">Switch demo role <ArrowRight /></Link>} />
+    <PageHeading eyebrow={`${data.unit} · DEMO PREVIEW`} title={data.heading} subtitle={data.intro} action={<span className="demo-tag"><span className="demo-dot" />SAMPLE DATA</span>} />
 
     <section className="hero-card" aria-label="Platform governance summary">
       <div className="hero-top"><span className="hero-tag">Governance overview snapshot</span><span className="hero-tag">LOCAL SAMPLE PROFILE</span></div>
